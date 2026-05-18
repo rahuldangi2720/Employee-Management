@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     @vite('resources/css/app.css')
 
 </head>
+
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
 
     <div class="w-full max-w-2xl bg-white shadow-2xl rounded-3xl overflow-hidden">
@@ -31,23 +33,23 @@
             <!-- Validation Errors -->
             @if($errors->any())
 
-                <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-5 py-4 rounded-xl">
+            <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-5 py-4 rounded-xl">
 
-                    <ul class="list-disc ml-5">
+                <ul class="list-disc ml-5">
 
-                        @foreach($errors->all() as $error)
+                    @foreach($errors->all() as $error)
 
-                            <li>{{$error}}</li>
+                    <li>{{$error}}</li>
 
-                        @endforeach
+                    @endforeach
 
-                    </ul>
+                </ul>
 
-                </div>
+            </div>
 
             @endif
 
-            <form action="/employee/store" method="post" class="space-y-6">
+            <form action="/employee/store" method="post" enctype="multipart/form-data" class="space-y-6">
 
                 @csrf
 
@@ -58,12 +60,11 @@
                         Employee Name
                     </label>
 
-                    <input 
+                    <input
                         type="text"
                         name="name"
                         placeholder="Enter employee name"
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
-                    >
+                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition">
 
                 </div>
 
@@ -74,12 +75,11 @@
                         Email Address
                     </label>
 
-                    <input 
+                    <input
                         type="email"
                         name="email"
                         placeholder="Enter email address"
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
-                    >
+                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition">
 
                 </div>
 
@@ -90,12 +90,25 @@
                         Salary
                     </label>
 
-                    <input 
+                    <input
                         type="number"
                         name="salary"
                         placeholder="Enter salary"
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition"
-                    >
+                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition">
+
+                </div>
+
+                <div>
+
+                    <label class="block mb-2 font-semibold text-gray-700">
+
+                        Employee Image
+
+                    </label>
+
+                    <input type="file"
+                        name="image"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white">
 
                 </div>
 
@@ -106,10 +119,9 @@
                         Department
                     </label>
 
-                    <select 
+                    <select
                         name="department_id"
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition bg-white"
-                    >
+                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition bg-white">
 
                         <option value="">
                             Select Department
@@ -117,11 +129,11 @@
 
                         @foreach($departments as $department)
 
-                            <option value="{{$department->id}}">
+                        <option value="{{$department->id}}">
 
-                                {{$department->department_name}}
+                            {{$department->department_name}}
 
-                            </option>
+                        </option>
 
                         @endforeach
 
@@ -132,14 +144,13 @@
                 <!-- Buttons -->
                 <div class="flex gap-4 pt-4">
 
-                    <button 
-                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition duration-300 shadow-md hover:shadow-lg"
-                    >
+                    <button
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition duration-300 shadow-md hover:shadow-lg">
                         Add Employee
                     </button>
 
                     <a href="/dashboard"
-                       class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-xl font-semibold transition duration-300">
+                        class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-xl font-semibold transition duration-300">
 
                         Back Dashboard
 
@@ -154,4 +165,5 @@
     </div>
 
 </body>
+
 </html>

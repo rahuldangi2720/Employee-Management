@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
@@ -13,7 +14,7 @@
 
 <body class="bg-gray-50 min-h-screen  overflow-x-hidden">
 
-   <div class="max-w-7xl mx-auto p-4 lg:p-6">
+    <div class="max-w-7xl mx-auto p-4 lg:p-6">
 
         <!-- Header -->
 
@@ -36,16 +37,14 @@
                 <a
                     href="/employee/create"
 
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm transition duration-300"
-                >
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm transition duration-300">
                     + Add Employee
                 </a>
 
                 <a
                     href="/logout"
 
-                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold shadow-sm transition duration-300"
-                >
+                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold shadow-sm transition duration-300">
                     Logout
                 </a>
 
@@ -76,12 +75,10 @@
 
                         placeholder="Search employee..."
 
-                        class="w-72 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    >
+                        class="w-72 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-200">
 
                     <button
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition duration-300"
-                    >
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition duration-300">
                         Search
                     </button>
 
@@ -231,6 +228,10 @@
                                     Department
                                 </th>
 
+                                <th class="px-6 py-4">
+                                    Image
+                                </th>
+
                                 <th class="px-6 py-4 text-center">
                                     Action
                                 </th>
@@ -243,59 +244,78 @@
 
                             @foreach($employees as $employee)
 
-                                <tr class="border-b hover:bg-gray-50 transition duration-200">
+                            <tr class="border-b hover:bg-gray-50 transition duration-200">
 
-                                    <td class="px-6 py-5 font-semibold text-gray-700">
-                                        {{$employee->id}}
-                                    </td>
+                                <td class="px-6 py-5 font-semibold text-gray-700">
+                                    {{$employee->id}}
+                                </td>
 
-                                    <td class="px-6 py-5 font-semibold text-gray-800">
-                                        {{$employee->name}}
-                                    </td>
+                                <td class="px-6 py-5 font-semibold text-gray-800">
+                                    {{$employee->name}}
+                                </td>
 
-                                    <td class="px-6 py-5 text-gray-600 break-words max-w-[180px]">
-                                        {{$employee->email}}
-                                    </td>
+                                <td class="px-6 py-5 text-gray-600 break-words max-w-[180px]">
+                                    {{$employee->email}}
+                                </td>
 
-                                    <td class="px-6 py-5 font-bold text-green-600">
-                                        ₹ {{$employee->salary}}
-                                    </td>
+                                <td class="px-6 py-5 font-bold text-green-600">
+                                    ₹ {{$employee->salary}}
+                                </td>
 
-                                    <td class="px-6 py-5">
+                                <td class="px-6 py-5">
 
-                                        <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                    <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
 
-                                            {{$employee->department->department_name}}
+                                        {{$employee->department->department_name}}
 
-                                        </span>
+                                    </span>
 
-                                    </td>
+                                </td>
 
-                                    <td class="px-6 py-5">
+                                <td class="px-6 py-5">
 
-                                        <div class="flex items-center justify-center gap-2 flex-wrap">
+                                    <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
 
-                                            <a
-                                                href="/employee/edit/{{$employee->id}}"
+                                      
+                                        @if($employee->image)
 
-                                                class="bg-yellow-400 hover:bg-yellow-500 text-white px-5 py-2 rounded-xl font-semibold transition duration-300"
-                                            >
-                                                Edit
-                                            </a>
+                                        <img src="{{asset('employees/'.$employee->image)}}"
+                                            class="w-14 h-14 rounded-full object-cover">
 
-                                            <a
-                                                href="/employee/delete/{{$employee->id}}"
+                                        @else
 
-                                                class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-semibold transition duration-300"
-                                            >
-                                                Delete
-                                            </a>
+                                        <img src="https://ui-avatars.com/api/?name={{$employee->name}}"
+                                            class="w-14 h-14 rounded-full">
 
-                                        </div>
+                                        @endif
+                                    </span>
 
-                                    </td>
+                                </td>
 
-                                </tr>
+
+                                <td class="px-6 py-5">
+
+                                    <div class="flex items-center justify-center gap-2 flex-wrap">
+
+                                        <a
+                                            href="/employee/edit/{{$employee->id}}"
+
+                                            class="bg-yellow-400 hover:bg-yellow-500 text-white px-5 py-2 rounded-xl font-semibold transition duration-300">
+                                            Edit
+                                        </a>
+
+                                        <a
+                                            href="/employee/delete/{{$employee->id}}"
+
+                                            class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-semibold transition duration-300">
+                                            Delete
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
 
                             @endforeach
 

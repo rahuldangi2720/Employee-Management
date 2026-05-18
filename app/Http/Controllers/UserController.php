@@ -11,17 +11,17 @@ use Illuminate\support\Facades\Auth;
 
 class UserController extends Controller
 {
-    function getUser(){
-        return "rahul dangi";
-    }
+    // function getUser(){
+    //     return "rahul dangi";
+    // }
 
-    function getUserName($name , $age ){
-        return "this is " . $name  . "   " .   "mohit age " . $age;
-    }
+    // function getUserName($name , $age ){
+    //     return "this is " . $name  . "   " .   "mohit age " . $age;
+    // }
 
-    function user(){
-        return view('user');   // call view from controller
-    }
+    // function user(){
+    //     return view('user');   // call view from controller
+    // }
 
     function admin(){
         if(view::exists('admin.login')){
@@ -79,8 +79,8 @@ class UserController extends Controller
 
     function logout (){
         Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        request()->session()->invalidate();   // invalidate() Deletes session.
+        request()->session()->regenerateToken();  // recreate csrf token 
           return  redirect('/userlogin');
     }
 

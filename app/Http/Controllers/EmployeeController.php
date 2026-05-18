@@ -49,8 +49,18 @@ class EmployeeController extends Controller
         ));
 
 
-        return view('dashboard', compact('employees', 'search'));
+        
     } // with('department') Automatically related department fetch karega.
+
+
+    function apiDashboard(){
+
+    $employees = Employee::with('department')
+                    ->paginate(5);
+
+    return response()->json($employees);
+
+}
 
 
     function create()
@@ -69,8 +79,18 @@ class EmployeeController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'salary' => 'required',
-            'department_id' => 'required'
+            'department_id' => 'required',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
         ]);
+
+        $imageName = null;
+
+        if ($req->hasFile('image')) {
+
+            $imageName = time() . '.' . $req->image->extension();
+
+            $req->image->move(public_path('employees'), $imageName);
+        }
 
         // for data save 
 
@@ -78,7 +98,9 @@ class EmployeeController extends Controller
             'name' => $req->name,
             'email' => $req->email,
             'salary' => $req->salary,
-            'department_id' => $req->department_id
+            'department_id' => $req->department_id,
+            'image' => $imageName
+
         ]);
 
         return redirect('/dashboard');
@@ -101,6 +123,12 @@ class EmployeeController extends Controller
 
         return view('employee-edit', compact('employee', 'departments'));
     }
+
+    function apiEmployees(){
+
+    return Employee::paginate(5);
+
+}
     // update  information
 
     function update(Request $req, $id)
@@ -111,16 +139,35 @@ class EmployeeController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'salary' => 'required',
-            'department_id' => 'required'
+            'department_id' => 'required',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
         ]);
 
         $employee = Employee::find($id);
+        $imageName = $employee->image;
+
+        if ($req->hasFile('image')) {
+
+            // old image delete
+
+            if ($employee->image && file_exists(public_path('employees/' . $employee->image))) {
+
+                unlink(public_path('employees/' . $employee->image));
+            }
+
+            // new image upload
+
+            $imageName = time() . '.' . $req->image->extension();
+
+            $req->image->move(public_path('employees'), $imageName);
+        }
         $employee->update([
 
             'name' => $req->name,
             'email' => $req->email,
             'salary' => $req->salary,
-            'department_id' => $req->department_id
+            'department_id' => $req->department_id,
+            'image' => $imageName,
 
         ]);
 
