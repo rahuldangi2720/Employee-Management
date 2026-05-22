@@ -12,11 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
+
             $table->id();
+
             $table->string('name');
+
             $table->string('email')->unique();
-            $table->string('department_id')->constrained(); //  constrained automatticaly link department_id with departments table id
+
+            $table->string('department_id')->constrained();
+
             $table->integer('salary');
+
+            $table->string('role')->default('employee');
+
             $table->timestamps();
         });
     }

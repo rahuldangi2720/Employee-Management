@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeController extends Controller
 {
@@ -47,20 +49,17 @@ class EmployeeController extends Controller
             'averageSalary'
 
         ));
-
-
-        
     } // with('department') Automatically related department fetch karega.
 
 
-    function apiDashboard(){
+    function apiDashboard()
+    {
 
-    $employees = Employee::with('department')
-                    ->paginate(5);
+        $employees = Employee::with('department')
+            ->paginate(5);
 
-    return response()->json($employees);
-
-}
+        return response()->json($employees);
+    }
 
 
     function create()
@@ -77,7 +76,7 @@ class EmployeeController extends Controller
     {
         $req->validate([
             'name' => 'required',
-            'email' => 'required|email',
+            'email' =>  'required|email|unique:users,email',
             'salary' => 'required',
             'department_id' => 'required',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
@@ -103,6 +102,19 @@ class EmployeeController extends Controller
 
         ]);
 
+        // User Table Save
+
+        User::create([
+
+            'name' => $req->name,
+            'email' => $req->email,
+
+            'password' => Hash::make('password'),
+
+            'role' => $req->role
+
+        ]);
+
         return redirect('/dashboard');
     }
 
@@ -124,11 +136,11 @@ class EmployeeController extends Controller
         return view('employee-edit', compact('employee', 'departments'));
     }
 
-    function apiEmployees(){
+    function apiEmployees()
+    {
 
-    return Employee::paginate(5);
-
-}
+        return Employee::paginate(5);
+    }
     // update  information
 
     function update(Request $req, $id)
@@ -136,12 +148,17 @@ class EmployeeController extends Controller
 
 
         $req->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'salary' => 'required',
-            'department_id' => 'required',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
-        ]);
+
+    'name' => 'required',
+    'email' => 'required|email',
+    'salary' => 'required',
+    'department_id' => 'required',
+    'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+
+    'role' => 'required'
+
+]);
+
 
         $employee = Employee::find($id);
         $imageName = $employee->image;
@@ -171,6 +188,28 @@ class EmployeeController extends Controller
             'role' => $req->role
 
         ]);
+
+        // Create login account only for HR/Admin
+
+        if ($req->role == 'hr' || $req->role == 'admin') {
+
+            $checkUser = User::where('email', $req->email)->first();
+
+            if (!$checkUser) {
+
+                User::create([
+
+                    'name' => $req->name,
+
+                    'email' => $req->email,
+
+                    'password' => Hash::make('password'),
+
+                    'role' => $req->role
+
+                ]);
+            }
+        }
 
         return redirect('/dashboard');
     }
