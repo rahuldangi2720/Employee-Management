@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\User;
 use App\Models\Department;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\support\Facades\view;  // use for check view exits or not
 use Illuminate\support\Facades\Auth;
-
 
 class ApiController extends Controller
 {
@@ -179,15 +180,25 @@ class ApiController extends Controller
 // API SIGNUP
 // ==========================================
 
-function apiSignup(Request $req){
-
-    $req->validate([
+public function apiSignup(Request $req)
+{
+    $validator = validator::make($req->all(), [
 
         'name' => 'required',
-        'email' => 'required|email|unique:users',
-        'password' => 'required'
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:6'
 
     ]);
+
+    if ($validator->fails()) {
+
+        return response()->json([
+
+            'success' => false,
+            'errors' => $validator->errors()
+
+        ], 422);
+    }
 
     $user = User::create([
 
@@ -203,8 +214,7 @@ function apiSignup(Request $req){
         'message' => 'User Registered Successfully',
         'data' => $user
 
-    ]);
-
+    ], 201);
 }
 
 
@@ -213,43 +223,33 @@ function apiSignup(Request $req){
 // API LOGIN
 // ==========================================
 
-function apiLogin(Request $req){
+public function apiLogin(Request $req){
 
+// Debugger hit ho isliye pehle validaation + logic ko yahin rakha gaya hai.
     $credentials = $req->validate([
-
         'email' => 'required|email',
         'password' => 'required'
-
     ]);
 
- 
-
-    if(Auth::attempt($credentials)){
+    if (Auth::attempt($credentials)) {
         $user = Auth::user();
         $token = $user->createToken('mytoken')->plainTextToken;
 
         return response()->json([
-
             'success' => true,
             'message' => 'Login Successful',
             'token' => $token,
-            'user'=> $user
-            // 'user' => Auth::user()
-
+            'user' => $user
         ]);
-
-    }else{
-
-        return response()->json([
-
-            'success' => false,
-            'message' => 'Invalid Email or Password'
-
-        ],401);
-
     }
 
+    return response()->json([
+        'success' => false,
+        'message' => 'Invalid Email or Password'
+    ], 401);
+
 }
+
 
 
 

@@ -19,7 +19,7 @@ Route::get('/dashboard',
 // GET ALL EMPLOYEES API
 // ==========================================
 
-Route::get('/employees',
+Route::middleware('auth:sanctum')->get('/employees',
 [ApiController::class,'apiEmployees']);
 
 

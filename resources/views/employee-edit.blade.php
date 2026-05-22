@@ -2,57 +2,46 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Edit Employee</title>
 
     @vite('resources/css/app.css')
 
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+<body class="bg-gradient-to-br from-orange-100 to-orange-200 min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-2xl bg-white shadow-2xl rounded-3xl overflow-hidden">
+    <div class="w-full max-w-5xl bg-white shadow-2xl rounded-3xl overflow-hidden">
 
         <!-- Header -->
-        <div class="bg-yellow-500 px-10 py-8">
+        <div class="bg-gradient-to-r from-yellow-500 to-orange-500 px-8 py-5">
 
-            <h1 class="text-4xl font-bold text-white">
-                Edit Employee
+            <h1 class="text-3xl font-bold text-white">
+                ✏️ Edit Employee
             </h1>
 
-            <p class="text-yellow-100 mt-2">
-                Update employee information
+            <p class="text-yellow-100 mt-1 text-sm">
+                Update employee information and permissions
             </p>
 
         </div>
 
-        <!-- Form -->
-        <div class="p-10">
+        <!-- Form Section -->
+        <div class="p-8">
 
-            @if($errors->any())
-
-            <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-5 py-4 rounded-xl">
-
-                <ul class="list-disc ml-5">
-
-                    @foreach($errors->all() as $error)
-
-                    <li>{{$error}}</li>
-
-                    @endforeach
-
-                </ul>
-
-            </div>
-
-            @endif
-
-            <form action="/employee/update/{{$employee->id}}" method="post" enctype="multipart/form-data" class="space-y-6">
+            <form 
+                action="/employee/update/{{$employee->id}}" 
+                method="POST" 
+                enctype="multipart/form-data"
+                class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                 @csrf
 
-                <!-- Name -->
+                <!-- Employee Name -->
                 <div>
 
                     <label class="block text-gray-700 font-semibold mb-2">
@@ -64,7 +53,8 @@
                         name="name"
                         value="{{$employee->name}}"
 
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                        focus:outline-none focus:ring-4 focus:ring-yellow-200">
 
                 </div>
 
@@ -80,7 +70,8 @@
                         name="email"
                         value="{{$employee->email}}"
 
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                        focus:outline-none focus:ring-4 focus:ring-yellow-200">
 
                 </div>
 
@@ -96,7 +87,8 @@
                         name="salary"
                         value="{{$employee->salary}}"
 
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 
+                        focus:outline-none focus:ring-4 focus:ring-yellow-200">
 
                 </div>
 
@@ -110,7 +102,8 @@
                     <select
                         name="department_id"
 
-                        class="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:border-yellow-500 transition bg-white">
+                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 bg-white
+                        focus:outline-none focus:ring-4 focus:ring-yellow-200">
 
                         @foreach($departments as $department)
 
@@ -129,41 +122,96 @@
 
                 </div>
 
+                <!-- Role -->
+                <div>
+
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        Employee Role
+                    </label>
+
+                    <select
+                        name="role"
+
+                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 bg-white 
+                        focus:outline-none focus:ring-4 focus:ring-blue-200">
+
+                        <option value="employee"
+                            {{ $employee->role == 'employee' ? 'selected' : '' }}>
+                            👨‍💼 Employee
+                        </option>
+
+                        <option value="hr"
+                            {{ $employee->role == 'hr' ? 'selected' : '' }}>
+                            🧑‍💻 HR Manager
+                        </option>
+
+                        <option value="admin"
+                            {{ $employee->role == 'admin' ? 'selected' : '' }}>
+                            👑 Administrator
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Image -->
                 <div>
 
                     <label class="block mb-2 font-semibold text-gray-700">
-
-                        Update Employee Image
-
+                        Profile Image
                     </label>
 
-                    <input type="file"
+                    <input 
+                        type="file"
                         name="image"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white">
-                    @if($employee->image)
+                        class="w-full border border-gray-300 rounded-xl px-4 py-2 bg-white">
 
-                    <div class="mt-4">
+                </div>
 
-                        <img src="{{asset('employees/'.$employee->image)}}"
-                            class="w-24 h-24 rounded-full object-cover border">
+                <!-- Current Image -->
+                @if($employee->image)
+
+                <div class="md:col-span-2 flex items-center gap-4">
+
+                    <img 
+                        src="{{ asset('employees/'.$employee->image) }}"
+                        class="w-20 h-20 rounded-2xl object-cover border shadow">
+
+                    <div>
+
+                        <p class="font-semibold text-gray-700">
+                            Current Employee Image
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Uploaded profile preview
+                        </p>
 
                     </div>
 
-                    @endif
                 </div>
 
+                @endif
+
                 <!-- Buttons -->
-                <div class="flex gap-4 pt-4">
+                <div class="md:col-span-2 flex gap-4 pt-3">
 
                     <button
-                        class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-3 rounded-xl font-semibold transition duration-300 shadow-md">
-                        Update Employee
+                        class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 
+                        hover:from-yellow-600 hover:to-orange-600 
+                        text-white py-3 rounded-xl font-semibold 
+                        transition duration-300 shadow-md">
+
+                        🚀 Update Employee
+
                     </button>
 
                     <a href="/dashboard"
-                        class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-xl font-semibold transition duration-300">
+                        class="flex-1 text-center bg-gray-100 hover:bg-gray-200 
+                        text-gray-700 py-3 rounded-xl font-semibold 
+                        transition duration-300 border border-gray-300">
 
-                        Back Dashboard
+                        ← Back Dashboard
 
                     </a>
 

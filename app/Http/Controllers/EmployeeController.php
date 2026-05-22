@@ -168,6 +168,7 @@ class EmployeeController extends Controller
             'salary' => $req->salary,
             'department_id' => $req->department_id,
             'image' => $imageName,
+            'role' => $req->role
 
         ]);
 

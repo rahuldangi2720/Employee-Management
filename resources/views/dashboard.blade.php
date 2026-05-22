@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,56 +13,73 @@
 
 </head>
 
-<body class="bg-gray-50 min-h-screen  overflow-x-hidden">
+<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 min-h-screen overflow-x-hidden">
 
-    <div class="max-w-7xl mx-auto p-4 lg:p-6">
+    <div class="max-w-[95%] 2xl:max-w-[1800px] mx-auto p-3 lg:p-5">
 
         <!-- Header -->
 
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-6">
 
             <div>
 
-                <h1 class="text-4xl font-extrabold text-blue-600">
+                <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     Employee Dashboard
                 </h1>
 
-                <p class="text-gray-500 mt-2">
-                    Manage all employees and departments
+                <p class="text-gray-500 mt-2 text-base">
+                    Manage employees, departments and company roles
                 </p>
 
             </div>
 
-            <div class="flex gap-3">
+            <div class="flex gap-3 flex-wrap">
+
+                <!-- Add Employee -->
 
                 <a
                     href="/employee/create"
 
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-sm transition duration-300">
-                    + Add Employee
+                    class="{{ Auth::user()->role != 'admin' ? 'hidden' : '' }}
+                    bg-gradient-to-r from-blue-600 to-indigo-600 
+                    hover:from-blue-700 hover:to-indigo-700 
+                    text-white px-5 py-2.5 rounded-2xl 
+                    font-semibold shadow-lg hover:scale-105 
+                    transition duration-300">
+
+                    ➕ Add Employee
+
                 </a>
+
+                <!-- Logout -->
 
                 <a
                     href="/logout"
 
-                    class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold shadow-sm transition duration-300">
+                    class="bg-gradient-to-r from-red-500 to-red-600 
+                    hover:from-red-600 hover:to-red-700 
+                    text-white px-5 py-2.5 rounded-2xl 
+                    font-semibold shadow-lg hover:scale-105 
+                    transition duration-300">
+
                     Logout
+
                 </a>
 
             </div>
 
         </div>
 
-        <!-- Main Dashboard Card -->
+        <!-- Dashboard Card -->
 
-        <div class="bg-white shadow-lg rounded-3xl overflow-hidden border border-gray-100">
+        <div class="backdrop-blur-xl bg-white/80 shadow-2xl rounded-[24px] overflow-hidden border border-white/40">
 
             <!-- Search Section -->
 
-            <div class="px-6 py-5 border-b flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-                <h2 class="text-2xl font-bold text-gray-700">
-                    Employee List
+                <h2 class="text-2xl font-bold text-gray-800">
+                    👨‍💼 Employee List
                 </h2>
 
                 <form action="/dashboard" method="get" class="flex gap-3">
@@ -75,24 +93,30 @@
 
                         placeholder="Search employee..."
 
-                        class="w-72 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                        class="w-72 border border-gray-300 rounded-2xl px-4 py-2.5 
+                        focus:outline-none focus:ring-4 focus:ring-blue-200 bg-white shadow-sm">
 
                     <button
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition duration-300">
+                        class="bg-gradient-to-r from-blue-600 to-indigo-600 
+                        hover:from-blue-700 hover:to-indigo-700 
+                        text-white px-5 py-2.5 rounded-2xl 
+                        font-semibold transition duration-300 shadow-md">
+
                         Search
+
                     </button>
 
                 </form>
 
             </div>
 
-            <!-- Statistics Cards -->
+            <!-- Statistics -->
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 p-5">
 
                 <!-- Total Employees -->
 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition duration-300">
+                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
 
                     <div class="flex items-center justify-between">
 
@@ -102,13 +126,13 @@
                                 Total Employees
                             </p>
 
-                            <h2 class="text-3xl font-bold text-blue-600 mt-3">
+                            <h2 class="text-2xl font-bold text-blue-600 mt-2">
                                 {{$totalEmployees}}
                             </h2>
 
                         </div>
 
-                        <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center text-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center text-xl">
                             👨‍💼
                         </div>
 
@@ -116,25 +140,25 @@
 
                 </div>
 
-                <!-- Total Departments -->
+                <!-- Departments -->
 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition duration-300">
+                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
 
                     <div class="flex items-center justify-between">
 
                         <div>
 
                             <p class="text-sm font-medium text-gray-500">
-                                Total Departments
+                                Departments
                             </p>
 
-                            <h2 class="text-3xl font-bold text-green-600 mt-3">
+                            <h2 class="text-2xl font-bold text-green-600 mt-2">
                                 {{$totalDepartments}}
                             </h2>
 
                         </div>
 
-                        <div class="w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center text-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center text-xl">
                             🏢
                         </div>
 
@@ -144,7 +168,7 @@
 
                 <!-- Highest Salary -->
 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition duration-300">
+                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
 
                     <div class="flex items-center justify-between">
 
@@ -154,13 +178,13 @@
                                 Highest Salary
                             </p>
 
-                            <h2 class="text-3xl font-bold text-purple-600 mt-3">
+                            <h2 class="text-2xl font-bold text-purple-600 mt-2">
                                 ₹ {{number_format($highestSalary)}}
                             </h2>
 
                         </div>
 
-                        <div class="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center text-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center text-xl">
                             💰
                         </div>
 
@@ -170,7 +194,7 @@
 
                 <!-- Average Salary -->
 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition duration-300">
+                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
 
                     <div class="flex items-center justify-between">
 
@@ -180,13 +204,13 @@
                                 Average Salary
                             </p>
 
-                            <h2 class="text-3xl font-bold text-red-500 mt-3">
+                            <h2 class="text-2xl font-bold text-red-500 mt-2">
                                 ₹ {{number_format($averageSalary)}}
                             </h2>
 
                         </div>
 
-                        <div class="w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center text-2xl">
+                        <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center text-xl">
                             📊
                         </div>
 
@@ -196,43 +220,33 @@
 
             </div>
 
-            <!-- Table -->
+            <!-- Table Section -->
 
-            <div class="px-6 pb-6">
+            <div class="px-4 pb-5">
 
-                <div>
+                <div class="overflow-x-auto rounded-3xl border border-gray-200 shadow-sm">
 
-                    <table class="w-full  text-left">
+                    <table class="w-full text-left">
 
-                        <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+                        <thead class="bg-gradient-to-r from-slate-100 to-blue-100 text-gray-700 uppercase text-sm tracking-wider">
 
                             <tr>
 
-                                <th class="px-6 py-4">
-                                    ID
-                                </th>
+                                <th class="px-6 py-4">ID</th>
 
-                                <th class="px-6 py-4">
-                                    Name
-                                </th>
+                                <th class="px-6 py-4">Name</th>
 
-                                <th class="px-6 py-4">
-                                    Email
-                                </th>
+                                <th class="px-6 py-4">Email</th>
 
-                                <th class="px-6 py-4">
-                                    Salary
-                                </th>
+                                <th class="px-6 py-4">Salary</th>
 
-                                <th class="px-6 py-4">
-                                    Department
-                                </th>
+                                <th class="px-6 py-4">Department</th>
 
-                                <th class="px-6 py-4">
-                                    Image
-                                </th>
+                                <th class="px-6 py-4">Role</th>
 
-                                <th class="px-6 py-4 text-center">
+                                <th class="px-6 py-4">Image</th>
+
+                                <th class="{{Auth::user()->role == 'employee' ? 'hidden' : '' }} px-6 py-4 text-center">
                                     Action
                                 </th>
 
@@ -244,27 +258,37 @@
 
                             @foreach($employees as $employee)
 
-                            <tr class="border-b hover:bg-gray-50 transition duration-200">
+                            <tr class="border-b hover:bg-blue-50/60 transition duration-300">
 
-                                <td class="px-6 py-5 font-semibold text-gray-700">
+                                <!-- ID -->
+
+                                <td class="px-6 py-3 font-semibold text-gray-700">
                                     {{$employee->id}}
                                 </td>
 
-                                <td class="px-6 py-5 font-semibold text-gray-800">
+                                <!-- Name -->
+
+                                <td class="px-6 py-3 font-bold text-gray-800">
                                     {{$employee->name}}
                                 </td>
 
-                                <td class="px-6 py-5 text-gray-600 break-words max-w-[180px]">
+                                <!-- Email -->
+
+                                <td class="px-6 py-3 text-gray-600 break-words max-w-[220px]">
                                     {{$employee->email}}
                                 </td>
 
-                                <td class="px-6 py-5 font-bold text-green-600">
+                                <!-- Salary -->
+
+                                <td class="px-6 py-3 font-bold text-green-600">
                                     ₹ {{$employee->salary}}
                                 </td>
 
-                                <td class="px-6 py-5">
+                                <!-- Department -->
 
-                                    <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                <td class="px-6 py-3">
+
+                                    <span class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
 
                                         {{$employee->department->department_name}}
 
@@ -272,43 +296,86 @@
 
                                 </td>
 
-                                <td class="px-6 py-5">
+                                <!-- Role -->
 
-                                    <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                <td class="px-6 py-3">
 
-                                      
-                                        @if($employee->image)
+                                    @if($employee->role == 'admin')
 
-                                        <img src="{{asset('employees/'.$employee->image)}}"
-                                            class="w-14 h-14 rounded-full object-cover">
-
-                                        @else
-
-                                        <img src="https://ui-avatars.com/api/?name={{$employee->name}}"
-                                            class="w-14 h-14 rounded-full">
-
-                                        @endif
+                                    <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
+                                        👑 Admin
                                     </span>
+
+                                    @elseif($employee->role == 'hr')
+
+                                    <span class="bg-purple-100 text-purple-600 px-4 py-2 rounded-full text-sm font-bold">
+                                        🧑‍💻 HR
+                                    </span>
+
+                                    @else
+
+                                    <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
+                                        👨‍💼 Employee
+                                    </span>
+
+                                    @endif
 
                                 </td>
 
+                                <!-- Image -->
 
-                                <td class="px-6 py-5">
+                                <td class="px-6 py-3">
+
+                                    @if($employee->image)
+
+                                    <img 
+                                        src="{{asset('employees/'.$employee->image)}}"
+                                        class="w-12 h-12 rounded-2xl object-cover shadow-lg border-2 border-white">
+
+                                    @else
+
+                                    <img 
+                                        src="https://ui-avatars.com/api/?name={{$employee->name}}"
+                                        class="w-12 h-12 rounded-2xl shadow-lg border-2 border-white">
+
+                                    @endif
+
+                                </td>
+
+                                <!-- Actions -->
+
+                                <td class="px-6 py-3">
 
                                     <div class="flex items-center justify-center gap-2 flex-wrap">
+
+                                        <!-- Edit -->
 
                                         <a
                                             href="/employee/edit/{{$employee->id}}"
 
-                                            class="bg-yellow-400 hover:bg-yellow-500 text-white px-5 py-2 rounded-xl font-semibold transition duration-300">
+                                            class="{{Auth::user()->role == 'employee' ? 'hidden' : '' }} 
+                                            bg-gradient-to-r from-yellow-400 to-orange-400 
+                                            hover:from-yellow-500 hover:to-orange-500 
+                                            text-white px-4 py-2 rounded-2xl 
+                                            font-semibold transition duration-300 shadow-md">
+
                                             Edit
+
                                         </a>
+
+                                        <!-- Delete -->
 
                                         <a
                                             href="/employee/delete/{{$employee->id}}"
 
-                                            class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-semibold transition duration-300">
+                                            class="{{Auth::user()->role == 'employee' ? 'hidden' : '' }} 
+                                            bg-gradient-to-r from-red-500 to-pink-500 
+                                            hover:from-red-600 hover:to-pink-600 
+                                            text-white px-4 py-2 rounded-2xl 
+                                            font-semibold transition duration-300 shadow-md">
+
                                             Delete
+
                                         </a>
 
                                     </div>
@@ -327,7 +394,7 @@
 
                 <!-- Pagination -->
 
-                <div class="mt-8 flex justify-center">
+                <div class="mt-6 flex justify-center">
 
                     {{$employees->links()}}
 

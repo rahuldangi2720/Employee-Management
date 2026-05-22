@@ -64,7 +64,8 @@ class UserController extends Controller
     }
 
 
-    function login(Request $req){
+    public function login(Request $req){
+        
         $cerdentails = $req->validate([
           'email'=>'required|email',
           'password' =>'required'
@@ -77,7 +78,7 @@ class UserController extends Controller
     }
 
 
-    function logout (){
+    public function logout (){
         Auth::logout();
         request()->session()->invalidate();   // invalidate() Deletes session.
         request()->session()->regenerateToken();  // recreate csrf token 
