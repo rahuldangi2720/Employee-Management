@@ -2,410 +2,198 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Employee Dashboard</title>
-
+    <title>{{ $pageTitle }}</title>
     @vite('resources/css/app.css')
-
 </head>
 
-<body class="bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 min-h-screen overflow-x-hidden">
-
-    <div class="max-w-[95%] 2xl:max-w-[1800px] mx-auto p-3 lg:p-5">
-
-        <!-- Header -->
-
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-6">
-
-            <div>
-
-                <h1 class="text-4xl lg:text-5xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    Employee Dashboard
-                </h1>
-
-                <p class="text-gray-500 mt-2 text-base">
-                    Manage employees, departments and company roles
-                </p>
-
-            </div>
-
-            <div class="flex gap-3 flex-wrap">
-
-                <!-- Add Employee -->
-
-                <a
-                    href="/employee/create"
-
-                    class="{{ Auth::user()->role != 'admin' ? 'hidden' : '' }}
-                    bg-gradient-to-r from-blue-600 to-indigo-600 
-                    hover:from-blue-700 hover:to-indigo-700 
-                    text-white px-5 py-2.5 rounded-2xl 
-                    font-semibold shadow-lg hover:scale-105 
-                    transition duration-300">
-
-                    ➕ Add Employee
-
-                </a>
-
-                <!-- Logout -->
-
-                <a
-                    href="/logout"
-
-                    class="bg-gradient-to-r from-red-500 to-red-600 
-                    hover:from-red-600 hover:to-red-700 
-                    text-white px-5 py-2.5 rounded-2xl 
-                    font-semibold shadow-lg hover:scale-105 
-                    transition duration-300">
-
-                    Logout
-
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- Dashboard Card -->
-
-        <div class="backdrop-blur-xl bg-white/80 shadow-2xl rounded-[24px] overflow-hidden border border-white/40">
-
-            <!-- Search Section -->
-
-            <div class="px-6 py-4 border-b border-gray-200 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-
-                <h2 class="text-2xl font-bold text-gray-800">
-                    👨‍💼 Employee List
-                </h2>
-
-                <form action="/dashboard" method="get" class="flex gap-3">
-
-                    <input
-                        type="text"
-
-                        name="search"
-
-                        value="{{$search}}"
-
-                        placeholder="Search employee..."
-
-                        class="w-72 border border-gray-300 rounded-2xl px-4 py-2.5 
-                        focus:outline-none focus:ring-4 focus:ring-blue-200 bg-white shadow-sm">
-
-                    <button
-                        class="bg-gradient-to-r from-blue-600 to-indigo-600 
-                        hover:from-blue-700 hover:to-indigo-700 
-                        text-white px-5 py-2.5 rounded-2xl 
-                        font-semibold transition duration-300 shadow-md">
-
-                        Search
-
-                    </button>
-
-                </form>
-
-            </div>
-
-            <!-- Statistics -->
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 p-5">
-
-                <!-- Total Employees -->
-
-                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm font-medium text-gray-500">
-                                Total Employees
-                            </p>
-
-                            <h2 class="text-2xl font-bold text-blue-600 mt-2">
-                                {{$totalEmployees}}
-                            </h2>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center text-xl">
-                            👨‍💼
-                        </div>
-
-                    </div>
-
+<body class="min-h-screen bg-slate-100 text-slate-900">
+    <div class="min-h-screen">
+        <header class="border-b border-slate-200 bg-white">
+            <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Employee Management System</p>
+                    <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">{{ $pageTitle }}</h1>
+                    <p class="mt-1 text-sm text-slate-500">Signed in as {{ Auth::user()->name }} with {{ strtoupper($role) }} access.</p>
                 </div>
 
-                <!-- Departments -->
+                <div class="flex flex-wrap items-center gap-3">
+                    @if ($canManageEmployees)
+                        <a
+                            href="{{ route('departments.create') }}"
+                            class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                        >
+                            Add Department
+                        </a>
+                        <a
+                            href="{{ route('employees.create') }}"
+                            class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700"
+                        >
+                            Add Employee
+                        </a>
+                    @endif
 
-                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm font-medium text-gray-500">
-                                Departments
-                            </p>
-
-                            <h2 class="text-2xl font-bold text-green-600 mt-2">
-                                {{$totalDepartments}}
-                            </h2>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center text-xl">
-                            🏢
-                        </div>
-
-                    </div>
-
+                    <form action="{{ route('logout') }}" method="post">
+                        @csrf
+                        <button
+                            type="submit"
+                            class="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+                        >
+                            Logout
+                        </button>
+                    </form>
                 </div>
-
-                <!-- Highest Salary -->
-
-                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm font-medium text-gray-500">
-                                Highest Salary
-                            </p>
-
-                            <h2 class="text-2xl font-bold text-purple-600 mt-2">
-                                ₹ {{number_format($highestSalary)}}
-                            </h2>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-2xl bg-purple-100 flex items-center justify-center text-xl">
-                            💰
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- Average Salary -->
-
-                <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-white/40 p-4 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-
-                    <div class="flex items-center justify-between">
-
-                        <div>
-
-                            <p class="text-sm font-medium text-gray-500">
-                                Average Salary
-                            </p>
-
-                            <h2 class="text-2xl font-bold text-red-500 mt-2">
-                                ₹ {{number_format($averageSalary)}}
-                            </h2>
-
-                        </div>
-
-                        <div class="w-12 h-12 rounded-2xl bg-red-100 flex items-center justify-center text-xl">
-                            📊
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
+        </header>
 
-            <!-- Table Section -->
+        <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-            <div class="px-4 pb-5">
+            <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                    <p class="text-sm font-medium text-slate-500">Total Employees</p>
+                    <p class="mt-3 text-3xl font-bold text-slate-950">{{ $totalEmployees }}</p>
+                </div>
 
-                <div class="overflow-x-auto rounded-3xl border border-gray-200 shadow-sm">
+                <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                    <p class="text-sm font-medium text-slate-500">Departments</p>
+                    <p class="mt-3 text-3xl font-bold text-emerald-700">{{ $totalDepartments }}</p>
+                </div>
 
-                    <table class="w-full text-left">
+                <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                    <p class="text-sm font-medium text-slate-500">Highest Salary</p>
+                    <p class="mt-3 text-3xl font-bold text-amber-700">Rs {{ number_format($highestSalary) }}</p>
+                </div>
 
-                        <thead class="bg-gradient-to-r from-slate-100 to-blue-100 text-gray-700 uppercase text-sm tracking-wider">
+                <div class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                    <p class="text-sm font-medium text-slate-500">Average Salary</p>
+                    <p class="mt-3 text-3xl font-bold text-indigo-700">Rs {{ number_format($averageSalary) }}</p>
+                </div>
+            </section>
 
+            <section class="mt-6 rounded-lg border border-slate-200 bg-white shadow-sm">
+                <div class="flex flex-col gap-4 border-b border-slate-200 p-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-950">Employee Directory</h2>
+                        <p class="mt-1 text-sm text-slate-500">Search, review, and manage employee login access.</p>
+                    </div>
+
+                    <form action="{{ route('dashboard') }}" method="get" class="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ $search }}"
+                            placeholder="Search by name, email, role, department"
+                            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-sky-500 focus:ring-4 focus:ring-sky-100 sm:w-80"
+                        >
+                        <button
+                            type="submit"
+                            class="rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700"
+                        >
+                            Search
+                        </button>
+                    </form>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[920px] text-left text-sm">
+                        <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wide text-slate-500">
                             <tr>
-
-                                <th class="px-6 py-4">ID</th>
-
-                                <th class="px-6 py-4">Name</th>
-
-                                <th class="px-6 py-4">Email</th>
-
-                                <th class="px-6 py-4">Salary</th>
-
-                                <th class="px-6 py-4">Department</th>
-
-                                <th class="px-6 py-4">Role</th>
-
-                                <th class="px-6 py-4">Image</th>
-
-                                <th class="{{Auth::user()->role == 'employee' ? 'hidden' : '' }} px-6 py-4 text-center">
-                                    Action
-                                </th>
-
+                                <th class="px-4 py-3">Employee</th>
+                                <th class="px-4 py-3">Email</th>
+                                <th class="px-4 py-3">Department</th>
+                                <th class="px-4 py-3">Salary</th>
+                                <th class="px-4 py-3">Role</th>
+                                @if ($canManageEmployees)
+                                    <th class="px-4 py-3 text-right">Actions</th>
+                                @endif
                             </tr>
-
                         </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse ($employees as $employee)
+                                <tr class="transition hover:bg-slate-50">
+                                    <td class="px-4 py-4">
+                                        <div class="flex items-center gap-3">
+                                            @if ($employee->image)
+                                                <img
+                                                    src="{{ asset('employees/' . $employee->image) }}"
+                                                    alt="{{ $employee->name }}"
+                                                    class="h-11 w-11 rounded-lg object-cover"
+                                                >
+                                            @else
+                                                <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-sky-100 text-sm font-bold text-sky-700">
+                                                    {{ strtoupper(substr($employee->name, 0, 1)) }}
+                                                </div>
+                                            @endif
 
-                        <tbody>
+                                            <div>
+                                                <p class="font-semibold text-slate-950">{{ $employee->name }}</p>
+                                                <p class="text-xs text-slate-500">ID: {{ $employee->id }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4 text-slate-600">{{ $employee->email }}</td>
+                                    <td class="px-4 py-4">
+                                        <span class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                                            {{ optional($employee->department)->department_name ?? 'Unassigned' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4 font-semibold text-slate-800">Rs {{ number_format($employee->salary) }}</td>
+                                    <td class="px-4 py-4">
+                                        @if ($employee->role === 'admin')
+                                            <span class="rounded-md bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700">Admin</span>
+                                        @elseif ($employee->role === 'hr')
+                                            <span class="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700">HR</span>
+                                        @else
+                                            <span class="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">Employee</span>
+                                        @endif
+                                    </td>
 
-                            @foreach($employees as $employee)
-
-                            <tr class="border-b hover:bg-blue-50/60 transition duration-300">
-
-                                <!-- ID -->
-
-                                <td class="px-6 py-3 font-semibold text-gray-700">
-                                    {{$employee->id}}
-                                </td>
-
-                                <!-- Name -->
-
-                                <td class="px-6 py-3 font-bold text-gray-800">
-                                    {{$employee->name}}
-                                </td>
-
-                                <!-- Email -->
-
-                                <td class="px-6 py-3 text-gray-600 break-words max-w-[220px]">
-                                    {{$employee->email}}
-                                </td>
-
-                                <!-- Salary -->
-
-                                <td class="px-6 py-3 font-bold text-green-600">
-                                    ₹ {{$employee->salary}}
-                                </td>
-
-                                <!-- Department -->
-
-                                <td class="px-6 py-3">
-
-                                    <span class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
-
-                                        {{$employee->department->department_name}}
-
-                                    </span>
-
-                                </td>
-
-                                <!-- Role -->
-
-                                <td class="px-6 py-3">
-
-                                    @if($employee->role == 'admin')
-
-                                    <span class="bg-red-100 text-red-600 px-4 py-2 rounded-full text-sm font-bold">
-                                        👑 Admin
-                                    </span>
-
-                                    @elseif($employee->role == 'hr')
-
-                                    <span class="bg-purple-100 text-purple-600 px-4 py-2 rounded-full text-sm font-bold">
-                                        🧑‍💻 HR
-                                    </span>
-
-                                    @else
-
-                                    <span class="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-bold">
-                                        👨‍💼 Employee
-                                    </span>
-
+                                    @if ($canManageEmployees)
+                                        <td class="px-4 py-4">
+                                            <div class="flex justify-end gap-2">
+                                                <a
+                                                    href="{{ route('employees.edit', $employee->id) }}"
+                                                    class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                                                >
+                                                    Edit
+                                                </a>
+                                                <form action="{{ route('employees.delete', $employee->id) }}" method="post" onsubmit="return confirm('Delete this employee and login account?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button
+                                                        type="submit"
+                                                        class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
                                     @endif
-
-                                </td>
-
-                                <!-- Image -->
-
-                                <td class="px-6 py-3">
-
-                                    @if($employee->image)
-
-                                    <img 
-                                        src="{{asset('employees/'.$employee->image)}}"
-                                        class="w-12 h-12 rounded-2xl object-cover shadow-lg border-2 border-white">
-
-                                    @else
-
-                                    <img 
-                                        src="https://ui-avatars.com/api/?name={{$employee->name}}"
-                                        class="w-12 h-12 rounded-2xl shadow-lg border-2 border-white">
-
-                                    @endif
-
-                                </td>
-
-                                <!-- Actions -->
-
-                                <td class="px-6 py-3">
-
-                                    <div class="flex items-center justify-center gap-2 flex-wrap">
-
-                                        <!-- Edit -->
-
-                                        <a
-                                            href="/employee/edit/{{$employee->id}}"
-
-                                            class="{{Auth::user()->role == 'employee' ? 'hidden' : '' }} 
-                                            bg-gradient-to-r from-yellow-400 to-orange-400 
-                                            hover:from-yellow-500 hover:to-orange-500 
-                                            text-white px-4 py-2 rounded-2xl 
-                                            font-semibold transition duration-300 shadow-md">
-
-                                            Edit
-
-                                        </a>
-
-                                        <!-- Delete -->
-
-                                        <a
-                                            href="/employee/delete/{{$employee->id}}"
-
-                                            class="{{Auth::user()->role == 'employee' ? 'hidden' : '' }} 
-                                            bg-gradient-to-r from-red-500 to-pink-500 
-                                            hover:from-red-600 hover:to-pink-600 
-                                            text-white px-4 py-2 rounded-2xl 
-                                            font-semibold transition duration-300 shadow-md">
-
-                                            Delete
-
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            @endforeach
-
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="{{ $canManageEmployees ? 6 : 5 }}" class="px-4 py-12 text-center text-sm text-slate-500">
+                                        No employees found.
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
-
                     </table>
-
                 </div>
 
-                <!-- Pagination -->
-
-                <div class="mt-6 flex justify-center">
-
-                    {{$employees->links()}}
-
+                <div class="border-t border-slate-200 px-4 py-4">
+                    {{ $employees->withQueryString()->links() }}
                 </div>
-
-            </div>
-
-        </div>
-
+            </section>
+        </main>
     </div>
-
 </body>
 
 </html>

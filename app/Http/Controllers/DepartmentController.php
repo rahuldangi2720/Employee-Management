@@ -7,21 +7,18 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
-    function addDepartment(Request $req){
-
-        $req->validate([  
-
-            'department_name'=>'required'
-
+    public function addDepartment(Request $req)
+    {
+        $req->validate([
+            'department_name' => 'required|string|max:255|unique:departments,department_name',
         ]);
 
         Department::create([
-
-            'department_name'=>$req->department_name
-
+            'department_name' => $req->department_name,
         ]);
 
-        return "Department Added Successfully";
-
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Department added successfully.');
     }
 }

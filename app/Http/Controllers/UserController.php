@@ -2,91 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\support\Facades\view;  // use for check view exits or not
-use Illuminate\support\Facades\Auth;
-
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    // function getUser(){
-    //     return "rahul dangi";
-    // }
-
-    // function getUserName($name , $age ){
-    //     return "this is " . $name  . "   " .   "mohit age " . $age;
-    // }
-
-    // function user(){
-    //     return view('user');   // call view from controller
-    // }
-
-    function admin(){
-        if(view::exists('admin.login')){
-            return view('admin.login');
-        }else{
-            echo "no view foundd";
-        }
-     
-    }
-    function home(){
-
-    return view('home');
-
-}
-
-
-    function main(){
-        if(view::exists('admin.signup')){
-            return view('admin.signup');
-        }else{
-            echo "  sorry no view found";
-        }
-     
-    }
-
-    function submit(Request $req){
-       $req->validate([
-        'name'=>'required',
-        'email'=>'required|email|unique:users',
-        'password'=>'required|confirmed'
-       ]);
-
-       User::create([
-        'name'=> $req->name,
-        'email'=>$req->email,
-        'password'=>Hash::make($req->password)
-       ]);
-
-      return redirect('/userlogin');
-    }
-
-
-    public function login(Request $req){
-        
-        $cerdentails = $req->validate([
-          'email'=>'required|email',
-          'password' =>'required'
+    public function login(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'role' => 'required|in:admin,hr,employee',
         ]);
-        if(Auth::attempt($cerdentails)){
-            return redirect('/dashboard');
-        }else {
-            return "Email or Password Incorrect";
+
+        $credentials = [
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+        ];
+
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            return back()
+                ->withErrors(['email' => 'Invalid email or password.'])
+                ->onlyInput('email', 'role');
         }
+
+        $request->session()->regenerate();
+
+        if (Auth::user()->role !== $validated['role']) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()
+                ->withErrors(['role' => 'The selected login type does not match this account.'])
+                ->onlyInput('email', 'role');
+        }
+
+        return redirect()
+            ->route('dashboard')
+            ->with('success', ucfirst($validated['role']) . ' login successful.');
     }
 
-
-    public function logout (){
+    public function logout(Request $request)
+    {
         Auth::logout();
-        request()->session()->invalidate();   // invalidate() Deletes session.
-        request()->session()->regenerateToken();  // recreate csrf token 
-          return  redirect('/userlogin');
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
-
-
-
-  
-
-}; 
+}

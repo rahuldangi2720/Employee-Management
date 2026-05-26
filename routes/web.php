@@ -1,78 +1,53 @@
 <?php
+
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/userform ');
+    return redirect()->route('login');
 });
 
-Route::get('/home', [UserController::class, 'home'])->middleware('auth');   // second method of routing   // for view open
-
-
-Route::get('admin/login', [UserController::class, 'admin']);    // nested view call through controlller  
-
-Route::get('admin/signup', [UserController::class, 'main']);
-
-// for user signup
-Route::view('/userform', 'usersingup-form');
-Route::post('/adduser', [UserController::class, 'submit']);
-
-// for user login
 Route::view('/userlogin', 'userlogin')->name('login');
-Route::post('/userlogin', [UserController::class, 'login']);
+Route::post('/userlogin', [UserController::class, 'login'])->name('login.submit');
 
-Route::get('/logout', [UserController::class, 'logout']);
+Route::match(['get', 'post'], '/logout', [UserController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
 
-/// for department 
-Route::view('/adddepartment', 'adddepartment');
-Route::post('/adddepartment', [DepartmentController::class, 'addDepartment']);
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [EmployeeController::class, 'dashboard'])->name('dashboard');
 
-// EmployeeController route
+    Route::redirect('/admin/dashboard', '/dashboard');
+    Route::redirect('/hr/dashboard', '/dashboard');
+    Route::redirect('/employee/dashboard', '/dashboard');
 
-Route::get('/dashboard', [EmployeeController::class, 'dashboard'])->middleware('auth');
+    Route::get('/adddepartment', function () {
+        return view('adddepartment');
+    })->middleware('admin')->name('departments.create');
 
-Route::get('employee/create', [EmployeeController::class, 'create'])->middleware('admin');
+    Route::post('/adddepartment', [DepartmentController::class, 'addDepartment'])
+        ->middleware('admin')
+        ->name('departments.store');
 
-Route::post('employee/store', [EmployeeController::class, 'store'])->middleware('auth');
+    Route::get('/employee/create', [EmployeeController::class, 'create'])
+        ->middleware('admin')
+        ->name('employees.create');
 
-Route::get('/employee/delete/{id}', [EmployeeController::class, 'delete'])->middleware('admin');
+    Route::post('/employee/store', [EmployeeController::class, 'store'])
+        ->middleware('admin')
+        ->name('employees.store');
 
-//  add edit routes
-Route::get('/employee/edit/{id}', [EmployeeController::class, 'edit'])->middleware('admin');
-Route::post('/employee/update/{id}', [EmployeeController::class, 'update'])->middleware('admin');
+    Route::get('/employee/edit/{id}', [EmployeeController::class, 'edit'])
+        ->middleware('admin')
+        ->name('employees.edit');
 
+    Route::post('/employee/update/{id}', [EmployeeController::class, 'update'])
+        ->middleware('admin')
+        ->name('employees.update');
 
-
-
-
-
-
-
-
-
-
-
-
-
-// Route::redirect('/','/home');  redirect directing in routing
-// Route::get( '/about' , function () { 
-//     return view('aboutus');
-// });  first method of routing   // when controler is also open then we use method
-
-// Route::get('/about', function () {
-//     return view('about');
-// });
-
-// Route::get('/about/{name}', function ($name) {
-//     //echo $name;
-//     return view('about', ['name' => $name]);
-// });     // FOR SENDING DYNAMIC DATA IN URL USING ROUTING
-
-// Route::get('user', [UserController::class, 'getUser']);  // call controller  ,  call view from controller  and route
-
-// Route::get('user/{name}/{age} ', [UserController::class, 'getUserName']);  // pass data ffrom route to controller 
-
-// Route::get('user', [UserController::class, 'user']);  // call view with controller
+    Route::delete('/employee/delete/{id}', [EmployeeController::class, 'delete'])
+        ->middleware('admin')
+        ->name('employees.delete');
+});

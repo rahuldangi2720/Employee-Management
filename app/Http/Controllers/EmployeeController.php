@@ -2,223 +2,208 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
-    function dashboard(Request $req)
+    public function dashboard(Request $request)
     {
-
-        $search = $req->search;
+        $search = $request->search;
 
         $employees = Employee::with('department')
-
             ->when($search, function ($query) use ($search) {
-
-                $query->where('id', 'LIKE', "%$search%")
-
-                    ->orWhere('name', 'LIKE', "%$search%")
-
-                    ->orWhere('email', 'LIKE', "%$search%");
+                $query->where(function ($employeeQuery) use ($search) {
+                    $employeeQuery->where('id', 'LIKE', "%{$search}%")
+                        ->orWhere('name', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%")
+                        ->orWhere('role', 'LIKE', "%{$search}%")
+                        ->orWhereHas('department', function ($departmentQuery) use ($search) {
+                            $departmentQuery->where('department_name', 'LIKE', "%{$search}%");
+                        });
+                });
             })
-
+            ->latest()
             ->paginate(5);
 
-
-        //   dashboard statistics 
-
-        $totalEmployees = Employee::count(); // SELECT COUNT(*) FROM employees;
+        $totalEmployees = Employee::count();
         $totalDepartments = Department::count();
-
-        $highestSalary = Employee::max('salary');  //SELECT MAX(salary) FROM employees;
-
-        $averageSalary = Employee::avg('salary');
+        $highestSalary = Employee::max('salary') ?? 0;
+        $averageSalary = Employee::avg('salary') ?? 0;
+        $role = Auth::user()->role;
+        $pageTitle = match ($role) {
+            'admin' => 'Admin Dashboard',
+            'hr' => 'HR Dashboard',
+            default => 'Employee Dashboard',
+        };
+        $canManageEmployees = $role === 'admin';
 
         return view('dashboard', compact(
-
+            'averageSalary',
+            'canManageEmployees',
             'employees',
-            'search',
-
-            'totalEmployees',
-            'totalDepartments',
             'highestSalary',
-            'averageSalary'
-
+            'pageTitle',
+            'role',
+            'search',
+            'totalDepartments',
+            'totalEmployees'
         ));
-    } // with('department') Automatically related department fetch karega.
-
-
-    function apiDashboard()
-    {
-
-        $employees = Employee::with('department')
-            ->paginate(5);
-
-        return response()->json($employees);
     }
 
+    public function apiDashboard()
+    {
+        return response()->json(Employee::with('department')->paginate(5));
+    }
 
-    function create()
+    public function create()
     {
         $departments = Department::all();
+
         return view('employee-create', compact('departments'));
-    }    //  SELECT * FROM departments 
+    }
 
-
-
-    // create store function 
-
-    function store(Request $req)
+    public function store(Request $request)
     {
-        $req->validate([
-            'name' => 'required',
-            'email' =>  'required|email|unique:users,email',
-            'salary' => 'required',
-            'department_id' => 'required',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:employees,email|unique:users,email',
+            'salary' => 'required|numeric|min:0',
+            'department_id' => 'required|exists:departments,id',
+            'role' => 'required|in:admin,hr,employee',
+            'password' => 'required|string|min:6|confirmed',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ]);
 
-        $imageName = null;
-
-        if ($req->hasFile('image')) {
-
-            $imageName = time() . '.' . $req->image->extension();
-
-            $req->image->move(public_path('employees'), $imageName);
-        }
-
-        // for data save 
+        $imageName = $this->storeImage($request);
 
         Employee::create([
-            'name' => $req->name,
-            'email' => $req->email,
-            'salary' => $req->salary,
-            'department_id' => $req->department_id,
-            'image' => $imageName
-
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'salary' => $validated['salary'],
+            'department_id' => $validated['department_id'],
+            'role' => $validated['role'],
+            'image' => $imageName,
         ]);
-
-        // User Table Save
 
         User::create([
-
-            'name' => $req->name,
-            'email' => $req->email,
-
-            'password' => Hash::make('password'),
-
-            'role' => $req->role
-
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
         ]);
 
-        return redirect('/dashboard');
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Employee account created successfully.');
     }
 
-    // for deleteing employe data 
-
-    function delete($id)
+    public function delete($id)
     {
-        Employee::find($id)->delete();
-        return redirect('/dashboard');
+        $employee = Employee::findOrFail($id);
+
+        User::where('email', $employee->email)->delete();
+
+        if ($employee->image && file_exists(public_path('employees/' . $employee->image))) {
+            unlink(public_path('employees/' . $employee->image));
+        }
+
+        $employee->delete();
+
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Employee deleted successfully.');
     }
 
-    // for edit employee information 
-
-    function edit($id)
+    public function edit($id)
     {
-        $employee = Employee::find($id);
+        $employee = Employee::findOrFail($id);
         $departments = Department::all();
+        $loginUser = User::where('email', $employee->email)->first();
 
-        return view('employee-edit', compact('employee', 'departments'));
+        return view('employee-edit', compact('departments', 'employee', 'loginUser'));
     }
 
-    function apiEmployees()
+    public function apiEmployees()
     {
-
         return Employee::paginate(5);
     }
-    // update  information
 
-    function update(Request $req, $id)
+    public function update(Request $request, $id)
     {
+        $employee = Employee::findOrFail($id);
+        $loginUser = User::where('email', $employee->email)->first();
 
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('employees', 'email')->ignore($employee->id),
+                Rule::unique('users', 'email')->ignore($loginUser?->id),
+            ],
+            'salary' => 'required|numeric|min:0',
+            'department_id' => 'required|exists:departments,id',
+            'role' => 'required|in:admin,hr,employee',
+            'password' => [$loginUser ? 'nullable' : 'required', 'string', 'min:6', 'confirmed'],
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        ]);
 
-        $req->validate([
-
-    'name' => 'required',
-    'email' => 'required|email',
-    'salary' => 'required',
-    'department_id' => 'required',
-    'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-
-    'role' => 'required'
-
-]);
-
-
-        $employee = Employee::find($id);
         $imageName = $employee->image;
 
-        if ($req->hasFile('image')) {
-
-            // old image delete
-
+        if ($request->hasFile('image')) {
             if ($employee->image && file_exists(public_path('employees/' . $employee->image))) {
-
                 unlink(public_path('employees/' . $employee->image));
             }
 
-            // new image upload
-
-            $imageName = time() . '.' . $req->image->extension();
-
-            $req->image->move(public_path('employees'), $imageName);
+            $imageName = $this->storeImage($request);
         }
+
         $employee->update([
-
-            'name' => $req->name,
-            'email' => $req->email,
-            'salary' => $req->salary,
-            'department_id' => $req->department_id,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'salary' => $validated['salary'],
+            'department_id' => $validated['department_id'],
+            'role' => $validated['role'],
             'image' => $imageName,
-            'role' => $req->role
-
         ]);
 
-        // Create login account only for HR/Admin
+        $userData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+        ];
 
-        if ($req->role == 'hr' || $req->role == 'admin') {
-
-            $checkUser = User::where('email', $req->email)->first();
-
-            if (!$checkUser) {
-
-                User::create([
-
-                    'name' => $req->name,
-
-                    'email' => $req->email,
-
-                    'password' => Hash::make('password'),
-
-                    'role' => $req->role
-
-                ]);
-            }
+        if ($request->filled('password')) {
+            $userData['password'] = Hash::make($validated['password']);
         }
 
-        return redirect('/dashboard');
+        if ($loginUser) {
+            $loginUser->update($userData);
+        } else {
+            $userData['password'] = Hash::make($validated['password']);
+            User::create($userData);
+        }
+
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Employee account updated successfully.');
     }
 
-    // SQL BEHIND THIS
+    private function storeImage(Request $request): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return null;
+        }
 
-    //Laravel internally runs:
+        $imageName = time() . '.' . $request->image->extension();
+        $request->image->move(public_path('employees'), $imageName);
 
-    //UPDATE employees
-    //SET name='Rahul'
-    //WHERE id=1
+        return $imageName;
+    }
 }

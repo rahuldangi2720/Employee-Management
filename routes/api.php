@@ -1,93 +1,36 @@
 <?php
 
 use App\Http\Controllers\ApiController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/dashboard', [ApiController::class, 'apiDashboard']);
+Route::get('/admin/dashboard', [ApiController::class, 'apiRoleDashboard'])->defaults('role', 'admin');
+Route::get('/hr/dashboard', [ApiController::class, 'apiRoleDashboard'])->defaults('role', 'hr');
+Route::get('/employee/dashboard', [ApiController::class, 'apiRoleDashboard'])->defaults('role', 'employee');
 
+Route::post('/signup', [ApiController::class, 'apiSignup']);
+Route::post('/login', [ApiController::class, 'apiLogin']);
+Route::post('/admin/login', [ApiController::class, 'apiLogin'])->defaults('role', 'admin');
+Route::post('/hr/login', [ApiController::class, 'apiLogin'])->defaults('role', 'hr');
+Route::post('/employee/login', [ApiController::class, 'apiLogin'])->defaults('role', 'employee');
 
-// ==========================================
-// DASHBOARD API
-// ==========================================
+Route::get('/employees', [ApiController::class, 'apiEmployees']);
+Route::get('/employees/{id}', [ApiController::class, 'apiSingleEmployee']);
 
-Route::get('/dashboard',
-[ApiController::class,'apiDashboard']);
+Route::get('/departments', [ApiController::class, 'apiDepartments']);
+Route::get('/departments/{id}', [ApiController::class, 'apiSingleDepartment']);
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [ApiController::class, 'apiMe']);
+    Route::post('/logout', [ApiController::class, 'apiLogout']);
 
+    Route::post('/employees', [ApiController::class, 'apiStoreEmployee']);
+    Route::put('/employees/{id}', [ApiController::class, 'apiUpdateEmployee']);
+    Route::patch('/employees/{id}', [ApiController::class, 'apiUpdateEmployee']);
+    Route::delete('/employees/{id}', [ApiController::class, 'apiDeleteEmployee']);
 
-// ==========================================
-// GET ALL EMPLOYEES API
-// ==========================================
-
-Route::middleware('auth:sanctum')->get('/employees',
-[ApiController::class,'apiEmployees']);
-
-
-
-// ==========================================
-// GET SINGLE EMPLOYEE API
-// ==========================================
-
-Route::get('/employees/{id}',
-[ApiController::class,'apiSingleEmployee']);
-
-
-
-// ==========================================
-// STORE EMPLOYEE API
-// ==========================================
-
-Route::post('/employees',
-[ApiController::class,'apiStoreEmployee']);
-
-
-
-// ==========================================
-// UPDATE EMPLOYEE API
-// ==========================================
-
-Route::put('/employees/{id}',
-[ApiController::class,'apiUpdateEmployee']);
-
-
-
-// ==========================================
-// DELETE EMPLOYEE API
-// ==========================================
-
-Route::delete('/employees/{id}',
-[ApiController::class,'apiDeleteEmployee']);
-
-
-// ==========================================
-// USER AUTH APIs
-// ==========================================
-
-Route::post('/signup',
-[ApiController::class,'apiSignup']);
-
-Route::post('/login',
-[ApiController::class,'apiLogin']);
-
-Route::post('/logout',
-[ApiController::class,'apiLogout']);
-
-
-// ==========================================
-// DEPARTMENT APIs
-// ==========================================
-
-Route::get('/departments',
-[ApiController::class,'apiDepartments']);
-
-Route::get('/departments/{id}',
-[ApiController::class,'apiSingleDepartment']);
-
-Route::post('/departments',
-[ApiController::class,'apiStoreDepartment']);
-
-Route::put('/departments/{id}',
-[ApiController::class,'apiUpdateDepartment']);
-
-Route::delete('/departments/{id}',
-[ApiController::class,'apiDeleteDepartment']);
+    Route::post('/departments', [ApiController::class, 'apiStoreDepartment']);
+    Route::put('/departments/{id}', [ApiController::class, 'apiUpdateDepartment']);
+    Route::patch('/departments/{id}', [ApiController::class, 'apiUpdateDepartment']);
+    Route::delete('/departments/{id}', [ApiController::class, 'apiDeleteDepartment']);
+});
